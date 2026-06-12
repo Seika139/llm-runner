@@ -8,6 +8,7 @@ from llm_runner.errors import (
     LlmRunnerError,
     LlmTimeoutError,
 )
+from llm_runner.fallback import FallbackRunner
 from llm_runner.record import JsonlRecorder, RunRecord
 from llm_runner.sdk import ClaudeSdk, CodexSdk
 
@@ -40,6 +41,7 @@ __all__ = [
     "CodexCli",
     "CodexSdk",
     "EmptyResponseError",
+    "FallbackRunner",
     "JsonlRecorder",
     "LlmRunnerError",
     "LlmTimeoutError",

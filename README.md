@@ -41,6 +41,19 @@ data = runner.run_json("次を JSON で分類してください: ...")  # フェ
 | `CodexCli`  | `codex exec`     | マシンの codex ログイン  | read-only サンドボックス。`CODEX_BIN` でパス上書き可        |
 | `CodexSdk`  | openai-codex     | 同上                     | extras `codex-sdk` が必要。下記の注意を参照                 |
 
+## フォールバック
+
+`FallbackRunner` で複数バックエンドを順に試せる。既定では `BackendNotAvailableError` (バイナリ / SDK が無いという環境の問題) のときだけ次へ進む。タイムアウトや実行失敗も対象にしたい場合は `fall_through` で明示する。
+
+```python
+from llm_runner import ClaudeCli, CodexCli, FallbackRunner
+
+runner = FallbackRunner([ClaudeCli(model="haiku"), CodexCli()])
+data = runner.run_json(prompt)  # claude が使えなければ codex で実行
+```
+
+失敗した試行も各 Runner の recorder に記録されるため、フォールバックの発生は実行記録から追跡できる。注意: バックエンドごとにモデルが異なるため、フォールバック先でも成立するプロンプトであることが前提。
+
 ## エラーハンドリング
 
 バックエンドを問わず統一例外を送出する。
