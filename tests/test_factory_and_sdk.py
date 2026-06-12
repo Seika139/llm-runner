@@ -26,9 +26,16 @@ class TestFactory:
 class TestSdkNotInstalled:
     """SDK extras 未導入の環境では、導入方法を含むエラーになることを保証する。
 
-    dev 環境には claude-agent-sdk / openai-codex を入れていないため、
-    この挙動を実環境のまま検証できる。
+    実行環境に SDK が入っているかに依存しないよう、import 失敗を
+    monkeypatch で再現して検証する。
     """
+
+    @pytest.fixture(autouse=True)
+    def no_sdk(self, monkeypatch):
+        def fail(module: str):
+            raise ImportError(f"No module named {module!r}")
+
+        monkeypatch.setattr("llm_runner.sdk.import_module", fail)
 
     def test_claude_sdk_raises_with_install_hint(self):
         with pytest.raises(BackendNotAvailableError, match=r"llm-runner\[claude-sdk\]"):
