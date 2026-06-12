@@ -1,0 +1,45 @@
+[tools]
+rumdl = "latest"
+taplo = "latest"
+uv = "latest"
+yamllint = "latest"
+
+#####################
+# Development Tasks #
+#####################
+
+[tasks.init]
+description = "開発環境のセットアップ"
+quiet = true
+run = ["uv sync"]
+
+[tasks.test]
+description = "テストを実行する"
+quiet = true
+run = ["uv run pytest"]
+
+[tasks.format]
+description = "rumdl, taplo, yamllint, ruff を使ってコードを整形する"
+quiet = true
+run = [
+  "uv run mdformat .",
+  "rumdl fmt",
+  "RUST_LOG=warn taplo fmt",
+  "yamllint -f auto .",
+  "uv run ruff format .",
+  "uv run ruff check --fix .",
+]
+
+[tasks.lint]
+description = "mdformat, rumdl, taplo, yamllint, ruff, ty を使ってコードをチェックする"
+quiet = true
+run = [
+  "uv run mdformat --check .",
+  "rumdl check",
+  "RUST_LOG=warn taplo fmt --check --diff",
+  "yamllint .",
+  "uv run ruff check .",
+  "uv run ruff format --check .",
+  "uv run ty check .",
+  "uv run pytest",
+]
