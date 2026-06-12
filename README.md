@@ -34,23 +34,23 @@ data = runner.run_json("次を JSON で分類してください: ...")  # フェ
 
 バックエンドは 4 種類。設定値から動的に選ぶ場合は `get_runner("claude-cli", model="haiku")` を使う。
 
-| クラス | 経由 | 認証 | 備考 |
-|---|---|---|---|
-| `ClaudeCli` | `claude -p` | マシンの claude ログイン | ツール全無効・セッション残さず。`CLAUDE_BIN` でパス上書き可 |
-| `ClaudeSdk` | claude-agent-sdk | 同上 | extras `claude-sdk` が必要 |
-| `CodexCli` | `codex exec` | マシンの codex ログイン | read-only サンドボックス。`CODEX_BIN` でパス上書き可 |
-| `CodexSdk` | openai-codex | 同上 | extras `codex-sdk` が必要。下記の注意を参照 |
+| クラス      | 経由             | 認証                     | 備考                                                        |
+| ----------- | ---------------- | ------------------------ | ----------------------------------------------------------- |
+| `ClaudeCli` | `claude -p`      | マシンの claude ログイン | ツール全無効・セッション残さず。`CLAUDE_BIN` でパス上書き可 |
+| `ClaudeSdk` | claude-agent-sdk | 同上                     | extras `claude-sdk` が必要                                  |
+| `CodexCli`  | `codex exec`     | マシンの codex ログイン  | read-only サンドボックス。`CODEX_BIN` でパス上書き可        |
+| `CodexSdk`  | openai-codex     | 同上                     | extras `codex-sdk` が必要。下記の注意を参照                 |
 
 ## エラーハンドリング
 
 バックエンドを問わず統一例外を送出する。
 
-| 例外 | 意味 |
-|---|---|
-| `LlmTimeoutError` | タイムアウト |
-| `BackendNotAvailableError` | CLI バイナリ / SDK パッケージが見つからない (メッセージに導入手順を含む) |
-| `EmptyResponseError` | 実行は成功扱いだが応答が空 (CLI 仕様変更などの「静かな故障」を顕在化させる) |
-| `LlmRunnerError` | 上記以外の実行失敗 (基底クラス) |
+| 例外                       | 意味                                                                        |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `LlmTimeoutError`          | タイムアウト                                                                |
+| `BackendNotAvailableError` | CLI バイナリ / SDK パッケージが見つからない (メッセージに導入手順を含む)    |
+| `EmptyResponseError`       | 実行は成功扱いだが応答が空 (CLI 仕様変更などの「静かな故障」を顕在化させる) |
+| `LlmRunnerError`           | 上記以外の実行失敗 (基底クラス)                                             |
 
 ## 実行記録 (RunRecord)
 

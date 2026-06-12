@@ -19,5 +19,5 @@
 - 空応答を `EmptyResponseError` として検知し、CLI / SDK の実バージョンを毎レコードに記録 (モデル・ツール更新起因の異常を後から分析可能)
 - SDK バックエンドの依存を optional extras (`llm-runner[claude-sdk]` / `llm-runner[codex-sdk]`) として分離 (コアは依存ゼロ)
 
-[Unreleased]: https://github.com/Seika139/llm-runner/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Seika139/llm-runner/releases/tag/v0.1.0
+[unreleased]: https://github.com/Seika139/llm-runner/compare/v0.1.0...HEAD

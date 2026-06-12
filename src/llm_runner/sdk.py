@@ -25,7 +25,7 @@ def _import_or_raise(module: str, extra: str):
         return import_module(module)
     except ImportError as e:
         raise BackendNotAvailableError(
-            f"{module} がインストールされていない。`uv add \"llm-runner[{extra}]\"` で導入すること。"
+            f'{module} がインストールされていない。`uv add "llm-runner[{extra}]"` で導入すること。'
         ) from e
 
 

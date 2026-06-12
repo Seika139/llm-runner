@@ -133,9 +133,7 @@ class TestRecording:
 
     def test_empty_response_is_recorded_as_its_own_kind(self, tmp_path):
         log = tmp_path / "runs.jsonl"
-        runner = ClaudeCli(
-            binary=make_fake_bin(tmp_path, "true"), recorder=JsonlRecorder(log)
-        )
+        runner = ClaudeCli(binary=make_fake_bin(tmp_path, "true"), recorder=JsonlRecorder(log))
         with pytest.raises(EmptyResponseError):
             runner.run("prompt")
         (record,) = self.read_records(log)
@@ -143,9 +141,7 @@ class TestRecording:
 
     def test_timeout_is_recorded(self, tmp_path):
         log = tmp_path / "runs.jsonl"
-        runner = ClaudeCli(
-            binary=make_fake_bin(tmp_path, "sleep 5"), recorder=JsonlRecorder(log)
-        )
+        runner = ClaudeCli(binary=make_fake_bin(tmp_path, "sleep 5"), recorder=JsonlRecorder(log))
         with pytest.raises(LlmTimeoutError):
             runner.run("prompt", timeout=0.3)
         (record,) = self.read_records(log)
@@ -155,7 +151,5 @@ class TestRecording:
         def broken_recorder(record):
             raise OSError("disk full")
 
-        runner = ClaudeCli(
-            binary=make_fake_bin(tmp_path, "echo hello"), recorder=broken_recorder
-        )
+        runner = ClaudeCli(binary=make_fake_bin(tmp_path, "echo hello"), recorder=broken_recorder)
         assert runner.run("prompt") == "hello\n"
