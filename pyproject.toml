@@ -9,7 +9,15 @@ dependencies = []
 
 [project.optional-dependencies]
 claude-sdk = ["claude-agent-sdk"]
-codex-sdk = ["openai-codex"]
+codex-sdk = ["openai-codex==0.1.0b3"]
+
+# openai-codex から同梱バイナリ依存 (openai-codex-cli-bin) を取り除く。
+# glibc Linux 向け wheel が無く、CI 等の uv sync が失敗するため。
+# 実行時は PATH (または CODEX_BIN) の codex CLI を codex_bin として使う。
+[[tool.uv.dependency-metadata]]
+name = "openai-codex"
+version = "0.1.0b3"
+requires-dist = []
 
 [dependency-groups]
 dev = [
