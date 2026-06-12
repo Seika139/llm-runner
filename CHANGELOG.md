@@ -9,6 +9,16 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-13
+
+### Added
+
+- 複数バックエンドを順に試す `FallbackRunner` を追加 (既定では `BackendNotAvailableError` のときだけ次へ進み、`fall_through` で条件を拡張できる)
+
+### Fixed
+
+- `openai-codex` の同梱バイナリ依存を除外し、glibc Linux 環境で extras を含む `uv sync` が失敗する問題を解消
+
 ## [0.1.0] - 2026-06-13
 
 ### Added
@@ -20,4 +30,5 @@
 - SDK バックエンドの依存を optional extras (`llm-runner[claude-sdk]` / `llm-runner[codex-sdk]`) として分離 (コアは依存ゼロ)
 
 [0.1.0]: https://github.com/Seika139/llm-runner/releases/tag/v0.1.0
-[unreleased]: https://github.com/Seika139/llm-runner/compare/v0.1.0...HEAD
+[0.2.0]: https://github.com/Seika139/llm-runner/compare/v0.1.0...v0.2.0
+[unreleased]: https://github.com/Seika139/llm-runner/compare/v0.2.0...HEAD
