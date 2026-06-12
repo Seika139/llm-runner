@@ -15,7 +15,7 @@ claude / codex を CLI または SDK 経由で headless 実行する薄いラン
 dependencies = ["llm-runner"]
 
 [tool.uv.sources]
-llm-runner = { git = "https://github.com/Seika139/llm-runner.git", tag = "v0.1.0" }
+llm-runner = { git = "https://github.com/Seika139/llm-runner.git", tag = "v0.2.0" }
 ```
 
 SDK バックエンドを使う場合は extras を指定する: `llm-runner[claude-sdk]` / `llm-runner[codex-sdk]`。
@@ -95,9 +95,11 @@ name = "openai-codex"
 requires-dist = []
 ```
 
-## テスト
+## 開発
 
 ```bash
-uv run pytest
-uv run ruff check .
+mise run init    # セットアップ
+mise run test    # テスト
+mise run format  # 整形
+mise run lint    # 全チェック (mdformat / rumdl / taplo / yamllint / ruff / ty / pytest)
 ```

@@ -11,4 +11,4 @@ number = true
 
 # mdformat は .gitignore を見ないため、仮想環境などを明示的に除外する
 # (rumdl は respect_gitignore で自動スキップするが mdformat は対象に含めてしまう)。
-exclude = [".venv/**", "**/.venv/**"]
+exclude = [".venv/**", "**/.venv/**", ".pytest_cache/**"]
