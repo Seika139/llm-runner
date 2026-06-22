@@ -23,7 +23,7 @@ requires-dist = []
 dev = [
   "mdformat>=1.0.0",
   "mdformat-gfm>=1.0.0",
-  "pytest>=8.0",
+  "pytest>=9.1.0",
   "ruff>=0.8",
   "ty>=0.0.49",
 ]
