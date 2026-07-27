@@ -9,7 +9,7 @@ dependencies = []
 
 [project.optional-dependencies]
 claude-sdk = ["claude-agent-sdk"]
-codex-sdk = ["openai-codex==0.1.0b3"]
+codex-sdk = ["openai-codex==0.144.4"]
 
 # openai-codex から同梱バイナリ依存 (openai-codex-cli-bin) を取り除く。
 # glibc Linux 向け wheel が無く、CI 等の uv sync が失敗するため。
@@ -24,8 +24,8 @@ dev = [
   "mdformat>=1.0.0",
   "mdformat-gfm>=1.0.0",
   "pytest>=9.1.1",
-  "ruff>=0.15.21",
-  "ty>=0.0.59",
+  "ruff>=0.15.22",
+  "ty>=0.0.61",
 ]
 
 [build-system]
