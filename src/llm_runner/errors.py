@@ -6,6 +6,14 @@
 
 from __future__ import annotations
 
+import re
+
+_RATE_LIMIT_RE = re.compile(
+    r"(?:rate[ _-]?limit|usage[ _-]?limit|quota exceeded|too many requests|"
+    r"you(?:'|’)ve hit your limit|status(?:_code)?[=: ]+429|http(?: error)? 429)",
+    re.IGNORECASE,
+)
+
 
 class LlmRunnerError(Exception):
     """実行失敗の基底例外 (非ゼロ終了、SDK 内部エラーなど)。"""
@@ -24,6 +32,25 @@ class BackendNotAvailableError(LlmRunnerError):
 
     message にインストール手順のヒントを含める。
     """
+
+
+class RateLimitError(LlmRunnerError):
+    """プロバイダーの rate / usage limit により実行できない。"""
+
+
+def is_rate_limit_error(value: object) -> bool:
+    """CLI の stderr や SDK 例外が rate limit を表すかを保守的に判定する。"""
+    for attr in ("status_code", "status"):
+        if getattr(value, attr, None) == 429:
+            return True
+    code = getattr(value, "code", None)
+    if isinstance(code, str) and code.lower().replace("-", "_") in {
+        "rate_limit",
+        "rate_limit_error",
+        "too_many_requests",
+    }:
+        return True
+    return bool(_RATE_LIMIT_RE.search(str(value)))
 
 
 class EmptyResponseError(LlmRunnerError):

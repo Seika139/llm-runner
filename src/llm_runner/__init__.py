@@ -7,6 +7,7 @@ from llm_runner.errors import (
     EmptyResponseError,
     LlmRunnerError,
     LlmTimeoutError,
+    RateLimitError,
 )
 from llm_runner.fallback import FallbackRunner
 from llm_runner.record import JsonlRecorder, RunRecord
@@ -45,6 +46,7 @@ __all__ = [
     "JsonlRecorder",
     "LlmRunnerError",
     "LlmTimeoutError",
+    "RateLimitError",
     "RunRecord",
     "Runner",
     "extract_json",

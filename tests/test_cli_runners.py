@@ -11,6 +11,7 @@ from llm_runner import (
     JsonlRecorder,
     LlmRunnerError,
     LlmTimeoutError,
+    RateLimitError,
 )
 
 
@@ -83,6 +84,19 @@ class TestRun:
         with pytest.raises(LlmRunnerError, match="exit 3"):
             runner.run("prompt")
 
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "rate limit exceeded",
+            "You've hit your limit · resets 5pm",
+            "HTTP 429: too many requests",
+        ],
+    )
+    def test_rate_limit_has_specific_error(self, tmp_path, message):
+        runner = ClaudeCli(binary=make_fake_bin(tmp_path, f'echo "{message}" >&2; exit 1'))
+        with pytest.raises(RateLimitError, match="利用上限"):
+            runner.run("prompt")
+
     def test_empty_response_raises(self, tmp_path):
         runner = ClaudeCli(binary=make_fake_bin(tmp_path, "true"))
         with pytest.raises(EmptyResponseError):
@@ -146,6 +160,17 @@ class TestRecording:
             runner.run("prompt", timeout=0.3)
         (record,) = self.read_records(log)
         assert record["error_kind"] == "timeout"
+
+    def test_rate_limit_is_recorded(self, tmp_path):
+        log = tmp_path / "runs.jsonl"
+        runner = ClaudeCli(
+            binary=make_fake_bin(tmp_path, "echo 'usage limit reached' >&2; exit 1"),
+            recorder=JsonlRecorder(log),
+        )
+        with pytest.raises(RateLimitError):
+            runner.run("prompt")
+        (record,) = self.read_records(log)
+        assert record["error_kind"] == "rate_limit"
 
     def test_recorder_failure_does_not_break_run(self, tmp_path):
         def broken_recorder(record):

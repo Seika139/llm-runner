@@ -7,7 +7,13 @@ import shutil
 import subprocess
 
 from llm_runner.base import Runner, _Invocation
-from llm_runner.errors import BackendNotAvailableError, LlmRunnerError, LlmTimeoutError
+from llm_runner.errors import (
+    BackendNotAvailableError,
+    LlmRunnerError,
+    LlmTimeoutError,
+    RateLimitError,
+    is_rate_limit_error,
+)
 
 STDERR_TAIL_CHARS = 500
 
@@ -58,6 +64,11 @@ class _CliRunner(Runner):
         inv.exit_code = completed.returncode
         inv.stderr_tail = _tail(completed.stderr)
         if completed.returncode != 0:
+            if is_rate_limit_error(completed.stderr):
+                raise RateLimitError(
+                    f"{self.command_name} CLI の利用上限に到達: "
+                    f"{inv.stderr_tail or '(stderr なし)'}"
+                )
             raise LlmRunnerError(
                 f"{self.command_name} CLI が失敗 (exit {completed.returncode}): "
                 f"{inv.stderr_tail or '(stderr なし)'}"

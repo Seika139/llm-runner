@@ -43,7 +43,7 @@ data = runner.run_json("次を JSON で分類してください: ...")  # フェ
 
 ## フォールバック
 
-`FallbackRunner` で複数バックエンドを順に試せる。既定では `BackendNotAvailableError` (バイナリ / SDK が無いという環境の問題) のときだけ次へ進む。タイムアウトや実行失敗も対象にしたい場合は `fall_through` で明示する。
+`FallbackRunner` で複数バックエンドを順に試せる。既定では `BackendNotAvailableError`（バイナリ / SDK が無い）または `RateLimitError`（rate / usage limit）のときだけ次へ進む。タイムアウトや通常の実行失敗も対象にしたい場合は `fall_through` で明示する。
 
 ```python
 from llm_runner import ClaudeCli, CodexCli, FallbackRunner
@@ -62,6 +62,7 @@ data = runner.run_json(prompt)  # claude が使えなければ codex で実行
 | -------------------------- | --------------------------------------------------------------------------- |
 | `LlmTimeoutError`          | タイムアウト                                                                |
 | `BackendNotAvailableError` | CLI バイナリ / SDK パッケージが見つからない (メッセージに導入手順を含む)    |
+| `RateLimitError`           | プロバイダーの rate / usage limit                                           |
 | `EmptyResponseError`       | 実行は成功扱いだが応答が空 (CLI 仕様変更などの「静かな故障」を顕在化させる) |
 | `LlmRunnerError`           | 上記以外の実行失敗 (基底クラス)                                             |
 
