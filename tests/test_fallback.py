@@ -10,6 +10,7 @@ from llm_runner import (
     FallbackRunner,
     JsonlRecorder,
     LlmRunnerError,
+    RateLimitError,
 )
 from test_cli_runners import make_fake_bin
 
@@ -43,6 +44,22 @@ class TestFallbackRunner:
         # 実行失敗 (exit 1) は既定ではフォールバック対象外なのでそのまま送出される
         with pytest.raises(LlmRunnerError, match="exit 1"):
             runner.run("prompt")
+
+    def test_falls_back_on_rate_limit_by_default(self, tmp_path: Path):
+        (tmp_path / "a").mkdir()
+        (tmp_path / "b").mkdir()
+        runner = FallbackRunner(
+            [
+                ClaudeCli(
+                    binary=make_fake_bin(tmp_path / "a", "echo 'rate limit exceeded' >&2; exit 1")
+                ),
+                CodexCli(binary=make_fake_bin(tmp_path / "b", "echo from-codex")),
+            ]
+        )
+        assert runner.run("prompt") == "from-codex\n"
+
+    def test_rate_limit_is_a_public_error(self):
+        assert issubclass(RateLimitError, LlmRunnerError)
 
     def test_custom_fall_through_extends_conditions(self, tmp_path: Path):
         (tmp_path / "a").mkdir()

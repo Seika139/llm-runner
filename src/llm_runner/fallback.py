@@ -10,7 +10,7 @@ import logging
 from collections.abc import Sequence
 
 from llm_runner.base import DEFAULT_TIMEOUT_SECONDS, Runner
-from llm_runner.errors import BackendNotAvailableError
+from llm_runner.errors import BackendNotAvailableError, RateLimitError
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 class FallbackRunner(Runner):
     """Runner のリストを順に試し、最初に成功した応答を返す。
 
-    既定では `BackendNotAvailableError` (バイナリ / SDK が無いという環境の問題)
-    のときだけ次の Runner へ進む。タイムアウトや実行失敗は一時的な混雑や
+    既定では `BackendNotAvailableError` (バイナリ / SDK が無いという環境の問題) または
+    `RateLimitError` (プロバイダーの利用上限) のときだけ次の Runner へ進む。タイムアウトや実行失敗は
     プロンプト起因の可能性があり、別バックエンドへ進むべきかはタスク次第の
     ため、対象にしたい場合は fall_through で明示する。
 
@@ -37,7 +37,7 @@ class FallbackRunner(Runner):
     def __init__(
         self,
         runners: Sequence[Runner],
-        fall_through: tuple[type[Exception], ...] = (BackendNotAvailableError,),
+        fall_through: tuple[type[Exception], ...] = (BackendNotAvailableError, RateLimitError),
     ) -> None:
         if not runners:
             raise ValueError("runners が空")

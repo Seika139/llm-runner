@@ -17,7 +17,12 @@ import shutil
 from importlib import import_module, metadata
 
 from llm_runner.base import Runner, _Invocation
-from llm_runner.errors import BackendNotAvailableError, LlmTimeoutError
+from llm_runner.errors import (
+    BackendNotAvailableError,
+    LlmTimeoutError,
+    RateLimitError,
+    is_rate_limit_error,
+)
 
 
 def _import_or_raise(module: str, extra: str):
@@ -61,6 +66,19 @@ class ClaudeSdk(Runner):
         async def collect() -> str:
             results: list[str] = []
             async for message in sdk.query(prompt=prompt, options=options):
+                # Claude Agent SDK may yield a rejected ``rate_limit_event``
+                # instead of raising an exception.  Inspect every event before
+                # ignoring messages that do not contain a final result.
+                info = getattr(message, "rate_limit_info", None)
+                if isinstance(info, dict):
+                    status = info.get("status")
+                else:
+                    status = getattr(info, "status", None)
+                # Keep support for SDK versions / test doubles that expose
+                # status directly, but prefer the real SDK event shape above.
+                status = status or getattr(message, "status", None)
+                if status == "rejected" and is_rate_limit_error(message):
+                    raise RateLimitError(str(message))
                 result = getattr(message, "result", None)
                 if result:
                     results.append(str(result))

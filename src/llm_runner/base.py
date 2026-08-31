@@ -19,6 +19,8 @@ from llm_runner.errors import (
     EmptyResponseError,
     LlmRunnerError,
     LlmTimeoutError,
+    RateLimitError,
+    is_rate_limit_error,
 )
 from llm_runner.record import HEAD_CHARS, RunRecord
 
@@ -99,7 +101,8 @@ class Runner(ABC):
             error = e
             raise
         except Exception as e:  # SDK 由来の想定外例外も統一例外に正規化する
-            error = LlmRunnerError(f"{type(e).__name__}: {e}")
+            error_type = RateLimitError if is_rate_limit_error(e) else LlmRunnerError
+            error = error_type(f"{type(e).__name__}: {e}")
             raise error from e
         finally:
             self._record(prompt, text, started, clock, inv, error)
@@ -165,6 +168,8 @@ def _classify(error: LlmRunnerError | None) -> str | None:
         return "timeout"
     if isinstance(error, BackendNotAvailableError):
         return "backend_not_available"
+    if isinstance(error, RateLimitError):
+        return "rate_limit"
     if isinstance(error, EmptyResponseError):
         return "empty_response"
     return "invocation_failed"

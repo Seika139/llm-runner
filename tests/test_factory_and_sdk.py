@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import pytest
 
 from llm_runner import (
@@ -5,6 +7,7 @@ from llm_runner import (
     BackendNotAvailableError,
     ClaudeSdk,
     CodexSdk,
+    RateLimitError,
     get_runner,
 )
 
@@ -44,3 +47,39 @@ class TestSdkNotInstalled:
     def test_codex_sdk_raises_with_install_hint(self):
         with pytest.raises(BackendNotAvailableError, match=r"llm-runner\[codex-sdk\]"):
             CodexSdk().run("prompt")
+
+
+def test_claude_sdk_detects_yielded_rate_limit_event(monkeypatch):
+    class FakeOptions:
+        def __init__(self, **values):
+            self.values = values
+
+    async def query(**_kwargs):
+        yield SimpleNamespace(
+            type="rate_limit_event",
+            rate_limit_info=SimpleNamespace(status="rejected"),
+        )
+
+    fake_sdk = SimpleNamespace(ClaudeAgentOptions=FakeOptions, query=query)
+    monkeypatch.setattr("llm_runner.sdk.import_module", lambda _module: fake_sdk)
+
+    with pytest.raises(RateLimitError, match="rate_limit_event"):
+        ClaudeSdk().run("prompt")
+
+
+def test_claude_sdk_ignores_non_rejected_rate_limit_event(monkeypatch):
+    class FakeOptions:
+        def __init__(self, **values):
+            self.values = values
+
+    async def query(**_kwargs):
+        yield SimpleNamespace(
+            type="rate_limit_event",
+            rate_limit_info={"status": "allowed"},
+        )
+        yield SimpleNamespace(result="completed")
+
+    fake_sdk = SimpleNamespace(ClaudeAgentOptions=FakeOptions, query=query)
+    monkeypatch.setattr("llm_runner.sdk.import_module", lambda _module: fake_sdk)
+
+    assert ClaudeSdk().run("prompt") == "completed"
