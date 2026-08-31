@@ -55,7 +55,10 @@ def test_claude_sdk_detects_yielded_rate_limit_event(monkeypatch):
             self.values = values
 
     async def query(**_kwargs):
-        yield SimpleNamespace(type="rate_limit_event", status="rejected")
+        yield SimpleNamespace(
+            type="rate_limit_event",
+            rate_limit_info=SimpleNamespace(status="rejected"),
+        )
 
     fake_sdk = SimpleNamespace(ClaudeAgentOptions=FakeOptions, query=query)
     monkeypatch.setattr("llm_runner.sdk.import_module", lambda _module: fake_sdk)
@@ -70,7 +73,10 @@ def test_claude_sdk_ignores_non_rejected_rate_limit_event(monkeypatch):
             self.values = values
 
     async def query(**_kwargs):
-        yield SimpleNamespace(type="rate_limit_event", status="allowed")
+        yield SimpleNamespace(
+            type="rate_limit_event",
+            rate_limit_info={"status": "allowed"},
+        )
         yield SimpleNamespace(result="completed")
 
     fake_sdk = SimpleNamespace(ClaudeAgentOptions=FakeOptions, query=query)
