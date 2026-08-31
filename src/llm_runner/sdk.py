@@ -69,10 +69,15 @@ class ClaudeSdk(Runner):
                 # Claude Agent SDK may yield a rejected ``rate_limit_event``
                 # instead of raising an exception.  Inspect every event before
                 # ignoring messages that do not contain a final result.
-                if (
-                    getattr(message, "status", None) == "rejected"
-                    and is_rate_limit_error(message)
-                ):
+                info = getattr(message, "rate_limit_info", None)
+                if isinstance(info, dict):
+                    status = info.get("status")
+                else:
+                    status = getattr(info, "status", None)
+                # Keep support for SDK versions / test doubles that expose
+                # status directly, but prefer the real SDK event shape above.
+                status = status or getattr(message, "status", None)
+                if status == "rejected" and is_rate_limit_error(message):
                     raise RateLimitError(str(message))
                 result = getattr(message, "result", None)
                 if result:
