@@ -10,8 +10,9 @@ from __future__ import annotations
 import json
 import time
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from llm_runner.errors import (
     BackendNotAvailableError,
@@ -85,7 +86,7 @@ class Runner(ABC):
             EmptyResponseError: 実行は成功したが応答が空だった
             LlmRunnerError: その他の実行失敗
         """
-        started = datetime.now(timezone.utc)
+        started = datetime.now(UTC)
         clock = time.monotonic()
         inv = _Invocation()
         text = ""
@@ -144,7 +145,7 @@ class Runner(ABC):
         )
         try:
             self.recorder(record)
-        except Exception:  # 記録の失敗で本処理を壊さない
+        except Exception:  # noqa: BLE001, S110  # 記録の失敗で本処理を壊さない
             pass
 
     def _cached_version(self) -> str | None:
@@ -152,7 +153,7 @@ class Runner(ABC):
             self._version_checked = True
             try:
                 self._version_cache = self._backend_version()
-            except Exception:
+            except Exception:  # noqa: BLE001  # バージョン取得失敗は実行可否に影響させない
                 self._version_cache = None
         return self._version_cache
 
