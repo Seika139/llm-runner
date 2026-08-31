@@ -62,3 +62,18 @@ def test_claude_sdk_detects_yielded_rate_limit_event(monkeypatch):
 
     with pytest.raises(RateLimitError, match="rate_limit_event"):
         ClaudeSdk().run("prompt")
+
+
+def test_claude_sdk_ignores_non_rejected_rate_limit_event(monkeypatch):
+    class FakeOptions:
+        def __init__(self, **values):
+            self.values = values
+
+    async def query(**_kwargs):
+        yield SimpleNamespace(type="rate_limit_event", status="allowed")
+        yield SimpleNamespace(result="completed")
+
+    fake_sdk = SimpleNamespace(ClaudeAgentOptions=FakeOptions, query=query)
+    monkeypatch.setattr("llm_runner.sdk.import_module", lambda _module: fake_sdk)
+
+    assert ClaudeSdk().run("prompt") == "completed"
