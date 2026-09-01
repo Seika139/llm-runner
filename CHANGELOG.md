@@ -7,7 +7,12 @@
 
 ## Tagged Releases
 
+- [unreleased](https://github.com/Seika139/llm-runner/compare/v0.3.0...HEAD)
+- [0.3.0](https://github.com/Seika139/llm-runner/releases/tag/v0.3.0)
+
 ## [Unreleased]
+
+## [0.3.0] - 2026-09-01
 
 ### Added
 
