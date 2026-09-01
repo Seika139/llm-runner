@@ -9,6 +9,16 @@
 
 ## [Unreleased]
 
+### Added
+
+- レートリミット到達を表す `RateLimitError` を公開 API に追加し、保守的な条件でのみレートリミットと判定する `is_rate_limit_error()` を追加
+- CLI バックエンドで実行失敗時の stderr がレートリミットを示す場合に `RateLimitError` として分類するよう変更
+- Claude SDK バックエンドで stream 中の `rate_limit_event` を検知し、`rate_limit_info.status` が `rejected` の場合のみ `RateLimitError` を送出するよう変更 (`allowed` などでは送出せず処理を継続)
+
+### Changed
+
+- `FallbackRunner` の既定 `fall_through` に `RateLimitError` を追加し、レート/使用量上限に到達した場合も次候補のバックエンドへ自動フォールバックするよう変更
+
 ## [0.2.0] - 2026-06-13
 
 ### Added
