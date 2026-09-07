@@ -24,8 +24,8 @@ dev = [
   "mdformat>=1.0.0",
   "mdformat-gfm>=1.0.0",
   "pytest>=9.1.1",
-  "ruff>=0.16.4",
-  "ty>=0.0.74",
+  "ruff>=0.16.5",
+  "ty>=0.0.75",
 ]
 
 [build-system]
