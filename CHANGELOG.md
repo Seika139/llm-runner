@@ -12,6 +12,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Dependabot が作成した PR のうち CI が通ったものを自動マージする `dependabot-auto-merge.yml` を追加。`Seika139/.github` の共通ワークフローを呼び出すだけの構成で、対象は共通ワークフロー側のデフォルト設定により patch と minor の更新のみとし、major は手動でマージする
+
 ## [0.3.0] - 2026-09-01
 
 ### Added
